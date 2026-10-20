@@ -1,0 +1,882 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Statistics & Reports</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #5145cd, #7866e8, #a18bf4);
+            font-family: Arial, sans-serif;
+        }
+
+        .report-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .brand { font-size: 27px; font-weight: bold; }
+        .topbar p { margin: 7px 0 0; }
+
+        .navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .navigation a,
+        .navigation button {
+            background: white;
+            color: #5145cd;
+            text-decoration: none;
+            padding: 11px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .navigation a:hover { background: #eeeaff; }
+
+        .report-header { color: white; margin-bottom: 25px; }
+        .report-header h1 { font-size: 34px; margin: 0 0 10px; }
+        .report-header p { line-height: 1.6; margin: 0; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 23px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .12);
+            border-top: 5px solid #764ba2;
+        }
+
+        .stat-card:nth-child(2) { border-top-color: #f0b429; }
+        .stat-card:nth-child(3) { border-top-color: #3498db; }
+        .stat-card:nth-child(4) { border-top-color: #27ae60; }
+
+        .stat-card h3 {
+            color: #555;
+            font-size: 14px;
+            margin: 0 0 15px;
+        }
+
+        .stat-number {
+            font-size: 35px;
+            font-weight: bold;
+            color: #5145cd;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, .12);
+        }
+
+        .panel h2 {
+            color: #5145cd;
+            font-size: 22px;
+            margin: 0 0 20px;
+        }
+
+        .completion-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .completion-percent {
+            font-size: 28px;
+            font-weight: bold;
+            color: #24834b;
+        }
+
+        .rate-track, .service-track {
+            height: 13px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .rate-track { margin-top: 15px; }
+
+        .rate-fill {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #27ae60);
+            transition: width .4s ease;
+        }
+
+        .service-row { margin-bottom: 25px; }
+        .service-row:last-child { margin-bottom: 0; }
+
+        .service-heading {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .service-name { font-weight: bold; color: #33277e; }
+
+        .service-details {
+            color: #666;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .service-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width .4s ease;
+        }
+
+        .chart-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .table-toolbar input,
+        .table-toolbar select {
+            padding: 11px 13px;
+            border: 1px solid #d8d4e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .table-toolbar input { flex: 1; min-width: 180px; }
+        .table-wrapper { overflow-x: auto; }
+
+        .report-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .report-table th, .report-table td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .report-table th { background: #f0edff; color: #5145cd; }
+        .report-table td { color: #444; }
+        .token-number { font-weight: bold; color: #5145cd !important; }
+
+        .priority-badge {
+            display: inline-block;
+            background: #fff0d6;
+            color: #996000;
+            padding: 4px 7px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-waiting { background: #fff0d6; color: #996000; }
+        .status-serving { background: #dff8e8; color: #187642; }
+        .status-completed { background: #e8e8ee; color: #555; }
+
+        .delete-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .delete-button:hover { background: #b02a37; }
+
+        .empty-message {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+        }
+
+        .report-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .report-actions button {
+            padding: 13px 19px;
+            border: none;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .download-button { color: white; background: #5145cd; }
+        .print-button { color: white; background: #21834b; }
+        .report-actions button:hover { opacity: .88; }
+
+        .report-note {
+            text-align: center;
+            color: white;
+            font-size: 13px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 15px; }
+            .report-header h1 { font-size: 28px; }
+            .panel { padding: 17px; }
+            .chart-wrapper { height: 260px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .topbar, .report-actions, .report-note, .table-toolbar,
+            .delete-column { display: none !important; }
+            .report-header { color: black; }
+            .panel, .stat-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+            .report-container { max-width: none; }
+        }
+    </style>
+</head>
+
+<body>
+<main class="report-container">
+
+    <header class="topbar">
+        <div>
+            <div class="brand">🎟️ SmartQueue</div>
+            <p>Statistics & Reports</p>
+        </div>
+
+        <nav class="navigation">
+            <a href="index.html">Home</a>
+            <a href="login.html" id="authLoginLink">Login</a>
+            <a href="dashboard.html" data-allowed-roles="Admin">Dashboard</a>
+            <a href="token.html" data-allowed-roles="Admin,Student">Get Token</a>
+            <a href="status.html" data-allowed-roles="Admin,Staff,Student">Token Status</a>
+            <a href="display.html">Live Queue</a>
+            <a href="staff.html" data-allowed-roles="Admin,Staff">Staff Controls</a>
+            <a href="reports.html" data-allowed-roles="Admin">Reports</a>
+
+            <span id="authUserInfo"
+                  style="color:white;font-weight:bold;align-self:center;"></span>
+
+            <button type="button"
+                    id="authLogoutButton"
+                    style="display:none;border:0;border-radius:9px;padding:11px 15px;cursor:pointer;"
+                    onclick="logoutUser()">Logout</button>
+        </nav>
+    </header>
+
+    <header class="report-header">
+        <h1>📊 Queue Statistics & Reports</h1>
+        <p>Track token activity, service performance and queue completion.</p>
+    </header>
+
+    <section class="stats-grid">
+        <article class="stat-card">
+            <h3>🎟️ Total Tokens</h3>
+            <div class="stat-number" id="totalTokens">0</div>
+        </article>
+        <article class="stat-card">
+            <h3>⏳ Waiting</h3>
+            <div class="stat-number" id="waitingTokens">0</div>
+        </article>
+        <article class="stat-card">
+            <h3>📢 Serving</h3>
+            <div class="stat-number" id="servingTokens">0</div>
+        </article>
+        <article class="stat-card">
+            <h3>✅ Completed</h3>
+            <div class="stat-number" id="completedTokens">0</div>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="completion-summary">
+            <div>
+                <h2>Completion Rate</h2>
+                <p id="completionText">0 of 0 tokens completed</p>
+            </div>
+            <div class="completion-percent" id="completionPercent">0%</div>
+        </div>
+
+        <div class="rate-track"
+             id="completionProgress"
+             role="progressbar"
+             aria-label="Token completion rate"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="0">
+            <div class="rate-fill" id="completionFill"></div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Service-wise Statistics</h2>
+        <div id="serviceStatistics"></div>
+    </section>
+
+    <section class="panel">
+        <h2>📊 Service Usage Chart</h2>
+        <p class="chart-description">
+            Compare the number of tokens generated for each service.
+        </p>
+
+        <div class="chart-wrapper" id="chartWrapper">
+            <canvas id="serviceUsageChart"
+                    role="img"
+                    aria-label="Bar chart showing total tokens for each service"></canvas>
+        </div>
+
+        <p id="chartUnavailable" class="empty-message" style="display:none;">
+            The chart library could not load. Check your internet connection.
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>Token Report</h2>
+
+        <div class="table-toolbar">
+            <input type="search"
+                   id="searchTokens"
+                   placeholder="Search token, name or service..."
+                   aria-label="Search tokens">
+
+            <select id="statusFilter" aria-label="Filter by status">
+                <option value="All">All statuses</option>
+                <option value="Waiting">Waiting</option>
+                <option value="Serving">Serving</option>
+                <option value="Completed">Completed</option>
+            </select>
+
+            <select id="serviceFilter" aria-label="Filter by service">
+                <option value="All">All services</option>
+                <option value="College Office">College Office</option>
+                <option value="Clinic">Clinic</option>
+                <option value="College Canteen">College Canteen</option>
+            </select>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Token Number</th>
+                        <th>Name</th>
+                        <th>Service</th>
+                        <th>Issue Time</th>
+                        <th>Status</th>
+                        <th class="delete-column">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody"></tbody>
+            </table>
+        </div>
+
+        <p id="emptyReport" class="empty-message">
+            No tokens available. Generate a token to see your report.
+        </p>
+    </section>
+
+    <nav class="report-actions">
+        <button type="button" class="download-button" id="downloadReport">
+            ⬇ Download CSV Report
+        </button>
+        <button type="button" class="print-button" id="printReport">
+            🖨️ Print Report
+        </button>
+    </nav>
+
+    <p class="report-note">
+        Statistics refresh automatically every 3 seconds.<br>
+        Data is saved in this browser and is not automatically deleted.
+    </p>
+
+</main>
+
+<script src="public/js/auth.js"></script>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "smartQueueTokens";
+
+const SERVICES = [
+    "College Office",
+    "Clinic",
+    "College Canteen"
+];
+
+let allTokens = [];
+let serviceUsageChart = null;
+let refreshTimer = null;
+
+function loadTokens() {
+    try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error("Unable to read tokens:", error);
+        return [];
+    }
+}
+
+function saveTokens(tokens) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+        return true;
+    } catch (error) {
+        console.error("Unable to save tokens:", error);
+        alert("Unable to save changes in this browser.");
+        return false;
+    }
+}
+
+function getCounts(tokens) {
+    return {
+        total: tokens.length,
+        waiting: tokens.filter(t => t.status === "Waiting").length,
+        serving: tokens.filter(t => t.status === "Serving").length,
+        completed: tokens.filter(t => t.status === "Completed").length
+    };
+}
+
+function formatTime(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleString([], {
+        dateStyle: "short",
+        timeStyle: "short"
+    });
+}
+
+function createCell(value, className = "") {
+    const cell = document.createElement("td");
+    cell.textContent = value == null || value === "" ? "—" : String(value);
+
+    if (className) cell.className = className;
+    return cell;
+}
+
+function renderReports() {
+    allTokens = loadTokens();
+
+    const counts = getCounts(allTokens);
+
+    document.getElementById("totalTokens").textContent = counts.total;
+    document.getElementById("waitingTokens").textContent = counts.waiting;
+    document.getElementById("servingTokens").textContent = counts.serving;
+    document.getElementById("completedTokens").textContent = counts.completed;
+
+    const rate = counts.total
+        ? Math.round(counts.completed / counts.total * 100)
+        : 0;
+
+    document.getElementById("completionText").textContent =
+        counts.completed + " of " + counts.total + " tokens completed";
+
+    document.getElementById("completionPercent").textContent = rate + "%";
+    document.getElementById("completionFill").style.width = rate + "%";
+    document.getElementById("completionProgress")
+        .setAttribute("aria-valuenow", rate);
+
+    renderServiceStatistics();
+    renderServiceUsageChart();
+    renderTokenTable();
+}
+
+function renderServiceStatistics() {
+    const container = document.getElementById("serviceStatistics");
+    container.replaceChildren();
+
+    SERVICES.forEach(service => {
+        const serviceTokens = allTokens.filter(t => t.service === service);
+        const counts = getCounts(serviceTokens);
+
+        const percent = serviceTokens.length
+            ? Math.round(counts.completed / serviceTokens.length * 100)
+            : 0;
+
+        const row = document.createElement("div");
+        row.className = "service-row";
+
+        const heading = document.createElement("div");
+        heading.className = "service-heading";
+
+        const name = document.createElement("span");
+        name.className = "service-name";
+        name.textContent = service;
+
+        const total = document.createElement("span");
+        total.textContent = serviceTokens.length + " total tokens";
+
+        heading.append(name, total);
+
+        const track = document.createElement("div");
+        track.className = "service-track";
+
+        const fill = document.createElement("div");
+        fill.className = "service-fill";
+        fill.style.width = percent + "%";
+        track.appendChild(fill);
+
+        const details = document.createElement("div");
+        details.className = "service-details";
+        details.textContent =
+            "Waiting: " + counts.waiting +
+            " | Serving: " + counts.serving +
+            " | Completed: " + counts.completed +
+            " | Completion: " + percent + "%";
+
+        row.append(heading, track, details);
+        container.appendChild(row);
+    });
+}
+
+function renderServiceUsageChart() {
+    const canvas = document.getElementById("serviceUsageChart");
+    const unavailable = document.getElementById("chartUnavailable");
+    const wrapper = document.getElementById("chartWrapper");
+
+    if (typeof Chart === "undefined") {
+        unavailable.style.display = "block";
+        wrapper.style.display = "none";
+        return;
+    }
+
+    unavailable.style.display = "none";
+    wrapper.style.display = "block";
+
+    const serviceCounts = SERVICES.map(service =>
+        allTokens.filter(token => token.service === service).length
+    );
+
+    if (serviceUsageChart) {
+        serviceUsageChart.data.datasets[0].data = serviceCounts;
+        serviceUsageChart.update();
+        return;
+    }
+
+    serviceUsageChart = new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: SERVICES,
+            datasets: [{
+                label: "Total Tokens",
+                data: serviceCounts,
+                backgroundColor: ["#5145cd", "#3498db", "#27ae60"],
+                borderRadius: 7,
+                maxBarThickness: 85
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context => "Total tokens: " + context.parsed.y
+                    }
+                }
+            }
+        }
+    });
+}
+
+function getFilteredTokens() {
+    const search = document.getElementById("searchTokens")
+        .value.trim().toLowerCase();
+
+    const status = document.getElementById("statusFilter").value;
+    const service = document.getElementById("serviceFilter").value;
+
+    return allTokens.filter(token => {
+        const matchesSearch = [
+            token.tokenNumber,
+            token.name,
+            token.service
+        ].some(value =>
+            String(value || "").toLowerCase().includes(search)
+        );
+
+        return matchesSearch &&
+            (status === "All" || token.status === status) &&
+            (service === "All" || token.service === service);
+    }).sort((a, b) => {
+        const timeA = new Date(a.createdAt || 0).getTime() || 0;
+        const timeB = new Date(b.createdAt || 0).getTime() || 0;
+        return timeB - timeA;
+    });
+}
+
+function renderTokenTable() {
+    const tbody = document.getElementById("reportTableBody");
+    tbody.replaceChildren();
+
+    const filtered = getFilteredTokens();
+
+    filtered.forEach(token => {
+        const row = document.createElement("tr");
+
+        const tokenCell = createCell(token.tokenNumber, "token-number");
+
+        if (token.priority === true) {
+            const priorityBadge = document.createElement("span");
+            priorityBadge.className = "priority-badge";
+            priorityBadge.textContent = "⭐ Priority";
+            tokenCell.appendChild(priorityBadge);
+        }
+
+        row.append(
+            tokenCell,
+            createCell(token.name),
+            createCell(token.service),
+            createCell(formatTime(token.createdAt))
+        );
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+
+        const validStatuses = ["Waiting", "Serving", "Completed"];
+        const status = validStatuses.includes(token.status)
+            ? token.status
+            : "Waiting";
+
+        badge.className = "status status-" + status.toLowerCase();
+        badge.textContent = status;
+
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        const actionCell = document.createElement("td");
+        actionCell.className = "delete-column";
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "Delete";
+        deleteButton.setAttribute(
+            "aria-label",
+            "Delete token " + String(token.tokenNumber || "")
+        );
+
+        deleteButton.addEventListener("click", () => {
+            deleteReportToken(token.id);
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+        tbody.appendChild(row);
+    });
+
+    const empty = document.getElementById("emptyReport");
+    empty.style.display = filtered.length ? "none" : "block";
+
+    empty.textContent = allTokens.length
+        ? "No tokens match your search or filters."
+        : "No tokens available. Generate a token to see your report.";
+}
+
+function deleteReportToken(id) {
+    const tokens = loadTokens();
+    const token = tokens.find(item => item.id === id);
+
+    if (!token) {
+        alert("Token not found. The report will refresh.");
+        renderReports();
+        return;
+    }
+
+    const confirmed = confirm(
+        "Permanently delete token " + token.tokenNumber +
+        " for " + token.name + "?\n\nThis action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    const updatedTokens = tokens.filter(item => item.id !== id);
+
+    if (saveTokens(updatedTokens)) {
+        renderReports();
+    }
+}
+
+function downloadCSV() {
+    const tokens = getFilteredTokens();
+
+    if (!tokens.length) {
+        alert("There are no matching tokens to export.");
+        return;
+    }
+
+    const columns = [
+        ["Token Number", "tokenNumber"],
+        ["Name", "name"],
+        ["Service", "service"],
+        ["Priority", "priority"],
+        ["Status", "status"],
+        ["Created At", "createdAt"]
+    ];
+
+    function escapeCSV(value) {
+        let text = String(value ?? "");
+
+        // Protect spreadsheet users from common formula-injection values.
+        if (/^[\s]*[=+\-@]/.test(text)) {
+            text = "'" + text;
+        }
+
+        return '"' + text.replace(/"/g, '""') + '"';
+    }
+
+    const rows = [
+        columns.map(column => escapeCSV(column[0])).join(","),
+        ...tokens.map(token =>
+            columns.map(column => {
+                const value = column[1] === "priority"
+                    ? (token.priority === true ? "Yes" : "No")
+                    : token[column[1]];
+
+                return escapeCSV(value);
+            }).join(",")
+        )
+    ];
+
+    const blob = new Blob(["\uFEFF" + rows.join("\r\n")], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "smartqueue-report.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function initializeReportsPage() {
+    if (typeof protectCurrentPage === "function") {
+        protectCurrentPage();
+    }
+
+    if (typeof updateAuthNavigation === "function") {
+        updateAuthNavigation();
+    }
+
+    renderReports();
+
+    document.getElementById("searchTokens")
+        .addEventListener("input", renderTokenTable);
+
+    document.getElementById("statusFilter")
+        .addEventListener("change", renderTokenTable);
+
+    document.getElementById("serviceFilter")
+        .addEventListener("change", renderTokenTable);
+
+    document.getElementById("downloadReport")
+        .addEventListener("click", downloadCSV);
+
+    document.getElementById("printReport")
+        .addEventListener("click", () => window.print());
+
+    refreshTimer = window.setInterval(renderReports, 3000);
+
+    window.addEventListener("storage", event => {
+        if (event.key === STORAGE_KEY || event.key === null) {
+            renderReports();
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", initializeReportsPage);
+</script>
+
+</body>
+</html>

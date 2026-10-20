@@ -1,0 +1,812 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Staff Counter</title>
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        .staff-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 28px 18px;
+        }
+
+        .staff-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .staff-header h1 {
+            font-size: clamp(28px, 5vw, 40px);
+            margin-bottom: 8px;
+        }
+
+        .staff-header p { margin: 6px; }
+
+        .staff-panel {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+        }
+
+        .staff-panel h2 {
+            color: #5b45c5;
+            margin: 0 0 18px;
+        }
+
+        .staff-panel label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .staff-panel select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        .counter-layout {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .current-token {
+            background: linear-gradient(135deg, #f0edff, #f9f7ff);
+            border: 1px solid #e0d8ff;
+            border-radius: 16px;
+            padding: 24px 15px;
+            text-align: center;
+        }
+
+        .counter-label {
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            color: #6c4bd2;
+        }
+
+        .current-token .number {
+            font-size: clamp(42px, 7vw, 58px);
+            font-weight: 800;
+            color: #764ba2;
+            margin: 12px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .current-token p { color: #444; margin: 8px 0; }
+
+        .counter-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            padding: 18px 10px;
+            border: 1px solid #eee;
+            border-radius: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .stat-card strong {
+            font-size: 30px;
+            color: #5b45c5;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-card span {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .staff-button {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .staff-button:disabled,
+        .small-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .complete-button { background: #18864b; }
+
+        .staff-message {
+            margin-top: 17px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f7f6fc;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .queue-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .queue-heading h2 { margin-bottom: 0; }
+
+        .queue-heading span { color: #666; font-size: 13px; }
+
+        .staff-table-wrapper { overflow-x: auto; }
+
+        .staff-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 780px;
+        }
+
+        .staff-table th,
+        .staff-table td {
+            padding: 13px 11px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .staff-table th {
+            background: #f0edff;
+            color: #5b45c5;
+            font-size: 13px;
+        }
+
+        .token-cell { font-weight: bold; color: #5b45c5; }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .waiting { background: #fff0c2; color: #805d00; }
+        .serving { background: #d7f8e5; color: #176b3a; }
+        .completed { background: #e5e7eb; color: #444; }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 15px;
+            background: #ffe1e1;
+            color: #b42318;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .priority-row { background: #fffafa; }
+
+        .small-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #eee9ff;
+            color: #5b45c5;
+            white-space: nowrap;
+            margin: 2px;
+        }
+
+        .priority-button { background: #fff0f0; color: #b42318; }
+        .delete-button { background: #ffe5e5; color: #b42318; }
+
+        .no-tokens {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+        }
+
+        .navigation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .navigation a,
+        .navigation button {
+            display: inline-block;
+            padding: 12px 18px;
+            border: 2px solid white;
+            border-radius: 25px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .navigation a:hover,
+        .navigation button:hover {
+            background: rgba(255, 255, 255, .15);
+        }
+
+        #authUserInfo {
+            color: white;
+            font-weight: bold;
+            align-self: center;
+        }
+
+        #authLogoutButton {
+            border: 0;
+            border-radius: 25px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .updated-note {
+            color: white;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 680px) {
+            .counter-layout { grid-template-columns: 1fr; }
+            .staff-panel { padding: 17px; }
+            .navigation { gap: 8px; }
+        }
+    </style>
+</head>
+
+<body>
+<main class="staff-container">
+    <header class="staff-header">
+        <h1>🧑‍💼 Staff Counter</h1>
+        <p>Call tokens, manage service, and monitor your queue.</p>
+    </header>
+
+    <section class="staff-panel">
+        <h2>Counter Dashboard</h2>
+
+        <label for="serviceFilter">Select Service Counter</label>
+        <select id="serviceFilter">
+            <option value="College Office">🏫 College Office</option>
+            <option value="Clinic">🏥 Clinic</option>
+            <option value="College Canteen">🍔 College Canteen</option>
+        </select>
+
+        <div class="counter-layout">
+            <div class="current-token">
+                <div class="counter-label">CURRENTLY SERVING</div>
+                <div class="number" id="currentToken">---</div>
+                <p id="currentName">No active token</p>
+                <p id="currentService">Choose a token to begin service.</p>
+            </div>
+
+            <div class="counter-stats">
+                <div class="stat-card">
+                    <strong id="waitingCount">0</strong>
+                    <span>Waiting</span>
+                </div>
+                <div class="stat-card">
+                    <strong id="completedCount">0</strong>
+                    <span>Completed</span>
+                </div>
+                <div class="stat-card">
+                    <strong id="totalCount">0</strong>
+                    <span>Total Tokens</span>
+                </div>
+                <div class="stat-card">
+                    <strong id="nextToken">—</strong>
+                    <span>Next Token</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button class="staff-button" id="callNextButton" type="button">
+                📢 Call Next Token
+            </button>
+            <button class="staff-button complete-button"
+                    id="completeButton" type="button" disabled>
+                ✅ Mark Completed
+            </button>
+        </div>
+
+        <p class="staff-message" id="staffMessage" aria-live="polite">
+            Select a service to manage its queue.
+        </p>
+    </section>
+
+    <section class="staff-panel">
+        <div class="queue-heading">
+            <h2>📋 Service Queue</h2>
+            <span id="lastUpdated">Loading queue…</span>
+        </div>
+
+        <div class="staff-table-wrapper">
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Token</th>
+                        <th>Customer</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="staffQueueBody"></tbody>
+            </table>
+        </div>
+
+        <p id="noTokensMessage" class="no-tokens">
+            No tokens found for this service.
+        </p>
+    </section>
+
+    <nav class="navigation" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="login.html" id="authLoginLink">Login</a>
+        <a href="dashboard.html" data-allowed-roles="Admin">Dashboard</a>
+        <a href="token.html" data-allowed-roles="Admin,Student">Get Token</a>
+        <a href="status.html" data-allowed-roles="Admin,Staff,Student">Token Status</a>
+        <a href="display.html">Live Display</a>
+        <a href="staff.html" data-allowed-roles="Admin,Staff">Staff Controls</a>
+        <a href="reports.html" data-allowed-roles="Admin">Reports</a>
+        <span id="authUserInfo"></span>
+        <button type="button" id="authLogoutButton"
+                style="display:none;" onclick="logoutUser()">
+            Logout
+        </button>
+    </nav>
+
+    <p class="updated-note">
+        Queue refreshes automatically every 3 seconds.
+        Token data is saved in this browser.
+    </p>
+</main>
+
+<script src="public/js/auth.js"></script>
+<script>
+"use strict";
+
+const STORAGE_KEY = "smartQueueTokens";
+
+const serviceFilter = document.getElementById("serviceFilter");
+const callNextButton = document.getElementById("callNextButton");
+const completeButton = document.getElementById("completeButton");
+const staffMessage = document.getElementById("staffMessage");
+
+function showMessage(message) {
+    staffMessage.textContent = message;
+}
+
+function getTokens() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = JSON.parse(raw || "[]");
+
+        if (!Array.isArray(parsed)) {
+            showMessage("Queue data is invalid. Please check browser storage.");
+            return [];
+        }
+
+        return parsed.filter(token =>
+            token && typeof token === "object" && !Array.isArray(token)
+        );
+    } catch (error) {
+        showMessage("Unable to read queue data. Check browser storage.");
+        return [];
+    }
+}
+
+function saveTokens(tokens) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+        return true;
+    } catch (error) {
+        showMessage("Unable to save changes. Check browser storage settings.");
+        return false;
+    }
+}
+
+function getTime(token) {
+    const timestamp = new Date(token.createdAt || 0).getTime();
+    return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function sortWaiting(a, b) {
+    const priorityDifference =
+        Number(Boolean(b.priority)) - Number(Boolean(a.priority));
+
+    return priorityDifference || getTime(a) - getTime(b);
+}
+
+function getCurrentToken(tokens, service) {
+    return tokens.find(token =>
+        token.service === service && token.status === "Serving"
+    );
+}
+
+function callNextToken() {
+    const service = serviceFilter.value;
+    const tokens = getTokens();
+
+    if (getCurrentToken(tokens, service)) {
+        showMessage("Complete the currently serving token first.");
+        return;
+    }
+
+    const next = tokens
+        .filter(token =>
+            token.service === service && token.status === "Waiting"
+        )
+        .sort(sortWaiting)[0];
+
+    if (!next) {
+        showMessage("There are no waiting tokens for this service.");
+        renderStaffPage();
+        return;
+    }
+
+    next.status = "Serving";
+
+    if (!saveTokens(tokens)) return;
+
+    showMessage(
+        "Now serving " + (next.tokenNumber || "the next token") +
+        " — " + (next.name || "Customer") + "."
+    );
+    renderStaffPage();
+}
+
+function completeCurrentToken() {
+    const service = serviceFilter.value;
+    const tokens = getTokens();
+    const current = getCurrentToken(tokens, service);
+
+    if (!current) {
+        showMessage("There is no active token to complete.");
+        renderStaffPage();
+        return;
+    }
+
+    current.status = "Completed";
+
+    if (!saveTokens(tokens)) return;
+
+    showMessage((current.tokenNumber || "Token") + " marked completed.");
+    renderStaffPage();
+}
+
+function togglePriority(tokenId) {
+    const tokens = getTokens();
+    const token = tokens.find(item => item.id === tokenId);
+
+    if (!token) {
+        showMessage("Token not found. Refreshing the queue.");
+        renderStaffPage();
+        return;
+    }
+
+    if (token.status !== "Waiting") {
+        showMessage("Priority can only be changed for waiting tokens.");
+        return;
+    }
+
+    token.priority = !Boolean(token.priority);
+
+    if (!saveTokens(tokens)) return;
+
+    showMessage(
+        token.priority
+            ? (token.tokenNumber || "Token") + " marked as priority."
+            : "Priority removed from " + (token.tokenNumber || "token") + "."
+    );
+
+    renderStaffPage();
+}
+
+function deleteToken(tokenId) {
+    const tokens = getTokens();
+    const token = tokens.find(item => item.id === tokenId);
+
+    if (!token) {
+        showMessage("Token not found. Refreshing the queue.");
+        renderStaffPage();
+        return;
+    }
+
+    if (!confirm(
+        "Delete token " + (token.tokenNumber || "") +
+        " for " + (token.name || "this customer") + "?\n\n" +
+        "This action cannot be undone."
+    )) {
+        return;
+    }
+
+    if (!saveTokens(tokens.filter(item => item.id !== tokenId))) return;
+
+    showMessage("Token " + (token.tokenNumber || "") + " deleted.");
+    renderStaffPage();
+}
+
+function addCell(row, value, className) {
+    const cell = document.createElement("td");
+    cell.textContent = value == null ? "" : String(value);
+
+    if (className) cell.className = className;
+    row.appendChild(cell);
+    return cell;
+}
+
+function addButton(parent, text, className, handler, label) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = text;
+    button.addEventListener("click", handler);
+
+    if (label) button.setAttribute("aria-label", label);
+
+    parent.appendChild(button);
+    return button;
+}
+
+function renderStaffPage() {
+    const service = serviceFilter.value;
+    const tokens = getTokens();
+
+    const serviceTokens = tokens
+        .filter(token => token.service === service)
+        .sort((a, b) => {
+            const order = { Serving: 0, Waiting: 1, Completed: 2 };
+            const difference =
+                (order[a.status] ?? 3) - (order[b.status] ?? 3);
+
+            if (difference) return difference;
+            if (a.status === "Waiting") return sortWaiting(a, b);
+            return getTime(a) - getTime(b);
+        });
+
+    const waiting = serviceTokens
+        .filter(token => token.status === "Waiting")
+        .sort(sortWaiting);
+
+    const completed = serviceTokens.filter(
+        token => token.status === "Completed"
+    );
+
+    const current = getCurrentToken(serviceTokens, service);
+    const next = waiting[0];
+
+    document.getElementById("currentToken").textContent =
+        current ? (current.tokenNumber || "—") : "---";
+
+    document.getElementById("currentName").textContent =
+        current ? "Customer: " + (current.name || "Unknown") : "No active token";
+
+    document.getElementById("currentService").textContent =
+        current ? service : "Choose Call Next Token to begin service.";
+
+    document.getElementById("waitingCount").textContent = waiting.length;
+    document.getElementById("completedCount").textContent = completed.length;
+    document.getElementById("totalCount").textContent = serviceTokens.length;
+    document.getElementById("nextToken").textContent =
+        next ? (next.tokenNumber || "—") : "—";
+
+    completeButton.disabled = !current;
+    callNextButton.disabled = Boolean(current) || waiting.length === 0;
+
+    const tbody = document.getElementById("staffQueueBody");
+    tbody.replaceChildren();
+
+    serviceTokens.forEach(token => {
+        const row = document.createElement("tr");
+
+        if (token.status === "Waiting" && token.priority) {
+            row.classList.add("priority-row");
+        }
+
+        let position = "—";
+        if (token.status === "Serving") position = "Serving";
+        else if (token.status === "Waiting") {
+            position = "#" + (waiting.indexOf(token) + 1);
+        } else if (token.status === "Completed") {
+            position = "Done";
+        }
+
+        addCell(row, position);
+        addCell(row, token.tokenNumber || "—", "token-cell");
+        addCell(row, token.name || "—");
+
+        const priorityCell = addCell(row, "");
+
+        if (token.status === "Waiting" && token.priority) {
+            const badge = document.createElement("span");
+            badge.className = "priority-badge";
+            badge.textContent = "★ PRIORITY";
+            priorityCell.appendChild(badge);
+        } else if (token.status === "Waiting") {
+            priorityCell.textContent = "Regular";
+        } else {
+            priorityCell.textContent = "—";
+        }
+
+        const statusCell = addCell(row, "");
+        const statusBadge = document.createElement("span");
+        const statusClasses = {
+            Waiting: "waiting",
+            Serving: "serving",
+            Completed: "completed"
+        };
+
+        statusBadge.className =
+            "status " + (statusClasses[token.status] || "waiting");
+        statusBadge.textContent = token.status || "Waiting";
+        statusCell.appendChild(statusBadge);
+
+        const actions = addCell(row, "");
+
+        if (token.status === "Waiting") {
+            addButton(
+                actions,
+                token.priority ? "★ Remove Priority" : "☆ Make Priority",
+                "small-button priority-button",
+                () => togglePriority(token.id)
+            );
+
+            const callButton = addButton(
+                actions,
+                "Call Token",
+                "small-button",
+                () => callSpecificToken(token.id)
+            );
+            callButton.disabled = Boolean(current);
+        } else {
+            actions.appendChild(
+                document.createTextNode(
+                    token.status === "Serving" ? "In service " : "Finished "
+                )
+            );
+        }
+
+        addButton(
+            actions,
+            "Delete",
+            "small-button delete-button",
+            () => deleteToken(token.id),
+            "Delete token " + (token.tokenNumber || "")
+        );
+
+        tbody.appendChild(row);
+    });
+
+    document.getElementById("noTokensMessage").style.display =
+        serviceTokens.length ? "none" : "block";
+
+    document.getElementById("lastUpdated").textContent =
+        "Updated " + new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+}
+
+function callSpecificToken(tokenId) {
+    const service = serviceFilter.value;
+    const tokens = getTokens();
+
+    if (getCurrentToken(tokens, service)) {
+        showMessage("Complete the currently serving token first.");
+        return;
+    }
+
+    const token = tokens.find(item =>
+        item.id === tokenId &&
+        item.service === service &&
+        item.status === "Waiting"
+    );
+
+    if (!token) {
+        showMessage("This token is no longer waiting. Queue refreshed.");
+        renderStaffPage();
+        return;
+    }
+
+    const next = tokens
+        .filter(item =>
+            item.service === service && item.status === "Waiting"
+        )
+        .sort(sortWaiting)[0];
+
+    if (next && next.id !== token.id) {
+        showMessage(
+            "Call the next token first: " + (next.tokenNumber || "unknown") +
+            (next.priority ? " (Priority)." : ".")
+        );
+        return;
+    }
+
+    token.status = "Serving";
+
+    if (!saveTokens(tokens)) return;
+
+    showMessage(
+        "Now serving " + (token.tokenNumber || "token") +
+        " — " + (token.name || "Customer") + "."
+    );
+    renderStaffPage();
+}
+
+function initializeStaffPage() {
+    if (typeof protectCurrentPage === "function") {
+        protectCurrentPage();
+    }
+
+    if (typeof updateAuthNavigation === "function") {
+        updateAuthNavigation();
+    }
+
+    callNextButton.addEventListener("click", callNextToken);
+    completeButton.addEventListener("click", completeCurrentToken);
+
+    serviceFilter.addEventListener("change", () => {
+        showMessage("Showing the queue for " + serviceFilter.value + ".");
+        renderStaffPage();
+    });
+
+    window.addEventListener("storage", event => {
+        if (event.key === STORAGE_KEY || event.key === null) {
+            renderStaffPage();
+        }
+    });
+
+    renderStaffPage();
+    setInterval(renderStaffPage, 3000);
+}
+
+document.addEventListener("DOMContentLoaded", initializeStaffPage);
+</script>
+</body>
+</html>

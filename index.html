@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Queue Management System</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4033a8, #7063df, #a18bf4);
+            color: white;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 65px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a,
+        .nav-links button {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            border: 1px solid rgba(255, 255, 255, .35);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            background: transparent;
+            cursor: pointer;
+            transition: all .25s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links button:hover {
+            background: white;
+            color: #5145cd;
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            font-size: 13px;
+            color: #fff4c2;
+            padding: 8px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 850px;
+            margin: 0 auto 65px;
+        }
+
+        .hero-icon {
+            font-size: 65px;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 {
+            font-size: clamp(38px, 6vw, 62px);
+            margin: 0 0 18px;
+            line-height: 1.15;
+        }
+
+        .hero h1 span {
+            color: #ffe28a;
+        }
+
+        .hero h2 {
+            font-size: clamp(19px, 3vw, 26px);
+            font-weight: normal;
+            margin: 0 0 18px;
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: 0 auto 30px;
+            font-size: 17px;
+            line-height: 1.8;
+            color: #f0edff;
+        }
+
+        .primary-button {
+            display: inline-block;
+            text-decoration: none;
+            background: white;
+            color: #5145cd;
+            padding: 15px 29px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, .2);
+        }
+
+        .features {
+            margin-bottom: 45px;
+        }
+
+        .features-heading {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .features-heading h2 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .features-heading p {
+            color: #f0edff;
+            line-height: 1.6;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, .18);
+        }
+
+        .feature-icon {
+            font-size: 38px;
+            margin-bottom: 14px;
+        }
+
+        .feature-card h3 {
+            color: #5145cd;
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+            min-height: 65px;
+        }
+
+        .feature-card a {
+            display: inline-block;
+            margin-top: 8px;
+            color: #5145cd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .feature-card a:hover {
+            text-decoration: underline;
+        }
+
+        .services {
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 18px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .services h2 {
+            margin-top: 0;
+            font-size: 25px;
+        }
+
+        .service-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .service-tag {
+            background: white;
+            color: #5145cd;
+            padding: 12px 17px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0 5px;
+            color: #f0edff;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                padding: 18px;
+            }
+
+            .navbar {
+                margin-bottom: 45px;
+            }
+
+            .nav-links {
+                width: 100%;
+                gap: 8px;
+            }
+
+            .nav-links a,
+            .nav-links button {
+                padding: 9px 11px;
+                font-size: 13px;
+            }
+
+            .hero {
+                margin-bottom: 45px;
+            }
+
+            .feature-card p {
+                min-height: auto;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-links a,
+            .nav-links button,
+            .primary-button,
+            .feature-card {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <!-- Navigation -->
+    <header class="navbar">
+
+        <div class="logo">🎟️ SmartQueue</div>
+
+        <nav class="nav-links" aria-label="Main navigation">
+
+            <a href="index.html">Home</a>
+
+            <a href="login.html" id="authLoginLink">Login</a>
+
+            <a href="dashboard.html"
+               data-allowed-roles="Admin">
+                Dashboard
+            </a>
+
+            <a href="token.html"
+               data-allowed-roles="Admin,Student">
+                Get Token
+            </a>
+
+            <a href="status.html"
+               data-allowed-roles="Admin,Staff,Student">
+                Check Status
+            </a>
+
+            <!-- Public queue display -->
+            <a href="display.html">Live Queue</a>
+
+            <a href="staff.html"
+               data-allowed-roles="Admin,Staff">
+                Staff
+            </a>
+
+            <a href="reports.html"
+               data-allowed-roles="Admin">
+                Reports
+            </a>
+
+            <span
+                id="authUserInfo"
+                class="user-info"
+                aria-live="polite"
+            ></span>
+
+            <button
+                id="authLogoutButton"
+                type="button"
+                onclick="logoutUser()"
+                hidden
+            >
+                Logout
+            </button>
+
+        </nav>
+    </header>
+
+    <!-- Welcome Section -->
+    <section class="hero">
+
+        <div class="hero-icon">🎟️</div>
+
+        <h1>Welcome to <span>SmartQueue</span></h1>
+
+        <h2>Smart Queue &amp; Token Management System</h2>
+
+        <p>
+            Say goodbye to long queues! Generate digital tokens,
+            monitor waiting times, manage service counters, and
+            track queue progress through one simple system.
+        </p>
+
+        <a
+            class="primary-button"
+            id="getStartedButton"
+            href="login.html"
+        >
+            Sign In to Get Started &nbsp; →
+        </a>
+
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+
+        <div class="features-heading">
+            <h2>Everything You Need</h2>
+            <p>
+                Simple tools for a smarter and more organized queue.
+            </p>
+        </div>
+
+        <div class="feature-grid">
+
+            <article
+                class="feature-card"
+                data-allowed-roles="Admin,Student"
+            >
+                <div class="feature-icon">🎫</div>
+
+                <h3>Digital Tokens</h3>
+
+                <p>
+                    Generate service tokens and view your token
+                    receipt without standing in a physical line.
+                </p>
+
+                <a href="token.html">Get a Token →</a>
+            </article>
+
+            <article
+                class="feature-card"
+                data-allowed-roles="Admin,Staff,Student"
+            >
+                <div class="feature-icon">🔎</div>
+
+                <h3>Token Status</h3>
+
+                <p>
+                    Check your token number, current queue status,
+                    and estimated waiting time.
+                </p>
+
+                <a href="status.html">Check My Token →</a>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">📺</div>
+
+                <h3>Live Queue Display</h3>
+
+                <p>
+                    View the current serving token, upcoming
+                    customers, and queue status.
+                </p>
+
+                <a href="display.html">View Live Queue →</a>
+            </article>
+
+            <article
+                class="feature-card"
+                data-allowed-roles="Admin,Staff"
+            >
+                <div class="feature-icon">🧑‍💼</div>
+
+                <h3>Staff Counter</h3>
+
+                <p>
+                    Call the next waiting token and mark a service
+                    as completed.
+                </p>
+
+                <a href="staff.html">Open Staff Controls →</a>
+            </article>
+
+            <article
+                class="feature-card"
+                data-allowed-roles="Admin"
+            >
+                <div class="feature-icon">📊</div>
+
+                <h3>Reports &amp; Statistics</h3>
+
+                <p>
+                    Review token totals, completion rates, service
+                    statistics, and export reports.
+                </p>
+
+                <a href="reports.html">View Reports →</a>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Available Services -->
+    <section class="services">
+
+        <h2>Available Services</h2>
+
+        <div class="service-tags">
+            <div class="service-tag">🏫 College Office</div>
+            <div class="service-tag">🏥 Clinic</div>
+            <div class="service-tag">🍔 College Canteen</div>
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <p>
+            <strong>SmartQueue</strong> — Smart Queue &amp; Token
+            Management System
+        </p>
+
+        <p>College Mini Project · Frontend Demonstration</p>
+
+    </footer>
+
+</main>
+
+<!-- Authentication script: include only once -->
+<script src="public/js/auth.js"></script>
+
+<script>
+    "use strict";
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const button = document.getElementById("getStartedButton");
+
+        // Refresh navigation according to the current session.
+        updateAuthNavigation();
+
+        function updateGetStartedButton() {
+            const user = getCurrentUser();
+
+            if (!button) {
+                return;
+            }
+
+            if (!user) {
+                button.href = "login.html";
+                button.textContent = "Sign In to Get Started →";
+                return;
+            }
+
+            if (user.role === "Admin") {
+                button.href = "dashboard.html";
+                button.textContent = "Open Admin Dashboard →";
+            } else if (user.role === "Staff") {
+                button.href = "staff.html";
+                button.textContent = "Open Staff Controls →";
+            } else if (user.role === "Student") {
+                button.href = "token.html";
+                button.textContent = "Generate Your Token →";
+            } else {
+                button.href = "login.html";
+                button.textContent = "Sign In to Get Started →";
+            }
+        }
+
+        updateGetStartedButton();
+
+        // Refresh navigation if the session changes in another tab.
+        window.addEventListener("storage", function (event) {
+            if (event.key === "smartQueueUser") {
+                updateAuthNavigation();
+                updateGetStartedButton();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

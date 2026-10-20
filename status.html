@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Check Token Status</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f2ff, #eef2ff);
+            color: #292447;
+        }
+
+        .container {
+            width: min(900px, 92%);
+            margin: 28px auto;
+        }
+
+        .hero {
+            padding: 28px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #5145cd, #9565ed);
+            color: white;
+            box-shadow: 0 12px 30px rgba(81, 69, 205, .2);
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(26px, 4vw, 34px);
+        }
+
+        .hero p { line-height: 1.6; margin: 0; }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #5145cd;
+            background: white;
+            border: 1px solid #e6e2ff;
+            padding: 11px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #5145cd;
+            color: white;
+        }
+
+        #authUserInfo {
+            align-self: center;
+            font-size: 13px;
+            color: #5145cd;
+        }
+
+        #authLogoutButton {
+            background: #fff0f0;
+            color: #a12626;
+            border: 1px solid #ffdada;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e6e2ff;
+            border-radius: 20px;
+            padding: 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 25px rgba(40, 30, 110, .07);
+        }
+
+        .panel h2 { margin-top: 0; color: #33277e; }
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 190px;
+            padding: 14px;
+            border: 1px solid #d9d4f5;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-form input:focus {
+            border-color: #5145cd;
+            box-shadow: 0 0 0 3px rgba(81, 69, 205, .12);
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, #5145cd, #9565ed);
+            color: white;
+        }
+
+        .secondary-button { background: #eeecff; color: #5145cd; }
+        button:hover { opacity: .9; }
+
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible {
+            outline: 3px solid #b7a8ff;
+            outline-offset: 3px;
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 13px;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        .error { background: #fff0f0; color: #a12626; }
+
+        .hint {
+            color: #77718f;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 14px;
+        }
+
+        .result { display: none; }
+
+        .token-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .token-number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #5145cd;
+            overflow-wrap: anywhere;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 9px 14px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-waiting { background: #fff2d5; color: #986500; }
+        .status-serving { background: #dcf8e7; color: #187545; }
+        .status-completed { background: #e9e7f3; color: #5f587c; }
+
+        .priority-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #ffe5e5;
+            color: #a12626;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .detail-card {
+            background: #f8f7ff;
+            border: 1px solid #eeecff;
+            border-radius: 14px;
+            padding: 18px;
+            min-width: 0;
+        }
+
+        .detail-label {
+            color: #77718f;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            color: #33277e;
+            font-size: 20px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .progress-track {
+            height: 9px;
+            background: #eeecff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 22px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #5145cd, #9565ed);
+            transition: width .3s ease;
+        }
+
+        .result-note {
+            color: #77718f;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 10px;
+            color: #817b9c;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .hero, .panel { padding: 20px; }
+
+            .search-form { flex-direction: column; }
+
+            .search-form input,
+            .search-form button { width: 100%; }
+
+            .details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <header class="hero">
+        <h1>🔎 Check Your Token Status</h1>
+        <p>
+            Enter your token number to check your queue position,
+            current status, and estimated waiting time.
+        </p>
+    </header>
+
+    <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html">🏠 Home</a>
+        <a href="login.html" id="authLoginLink">🔐 Login</a>
+        <a href="dashboard.html" data-allowed-roles="Admin">📊 Dashboard</a>
+        <a href="token.html" data-allowed-roles="Admin,Student">🎫 Get Token</a>
+        <a href="status.html" class="active"
+           data-allowed-roles="Admin,Staff,Student">🔎 Check Status</a>
+        <a href="display.html">📺 Queue Display</a>
+        <a href="staff.html" data-allowed-roles="Admin,Staff">👨‍💼 Staff Panel</a>
+        <a href="reports.html" data-allowed-roles="Admin">📈 Reports</a>
+
+        <span id="authUserInfo"></span>
+
+        <button type="button" id="authLogoutButton"
+                style="display:none;" onclick="logoutUser()">
+            Logout
+        </button>
+    </nav>
+
+    <section class="panel">
+        <h2>Find Your Token</h2>
+
+        <form class="search-form" id="lookupForm">
+            <input type="text" id="tokenInput"
+                   placeholder="Example: CO001"
+                   aria-label="Token number"
+                   autocomplete="off" required>
+
+            <button type="submit" class="primary-button">
+                Check Status
+            </button>
+        </form>
+
+        <p class="hint">
+            Enter the token number printed on your receipt.
+            Your result refreshes automatically while this page is open.
+        </p>
+
+        <div id="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel result" id="resultPanel" aria-live="polite">
+        <div class="token-heading">
+            <div>
+                <div class="detail-label">Your Token Number</div>
+                <div class="token-number" id="resultToken">—</div>
+                <div id="priorityContainer"></div>
+            </div>
+
+            <span id="resultStatus" class="status-badge">Waiting</span>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-card">
+                <div class="detail-label">Student Name</div>
+                <div class="detail-value" id="resultName">—</div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-label">Service</div>
+                <div class="detail-value" id="resultService">—</div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-label">People Ahead</div>
+                <div class="detail-value" id="resultAhead">—</div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-label">Estimated Waiting Time</div>
+                <div class="detail-value" id="resultWait">—</div>
+            </div>
+        </div>
+
+        <div class="progress-track" id="progressTrack"
+             role="progressbar" aria-label="Queue progress"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <p class="result-note" id="resultNote"></p>
+
+        <button type="button" class="secondary-button" id="clearButton">
+            Clear Search
+        </button>
+    </section>
+
+    <footer class="footer">
+        SmartQueue — Smart Token and Queue Management System
+    </footer>
+
+</main>
+
+<script src="public/js/auth.js"></script>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "smartQueueTokens";
+
+const serviceDurations = {
+    "College Office": 5,
+    "Clinic": 10,
+    "College Canteen": 3
+};
+
+const form = document.getElementById("lookupForm");
+const tokenInput = document.getElementById("tokenInput");
+const message = document.getElementById("message");
+const resultPanel = document.getElementById("resultPanel");
+
+let searchedTokenNumber = "";
+
+function getTokens() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        const tokens = saved ? JSON.parse(saved) : [];
+
+        return Array.isArray(tokens) ? tokens : null;
+    } catch (error) {
+        console.error("Could not load tokens:", error);
+        return null;
+    }
+}
+
+function setText(id, value) {
+    document.getElementById(id).textContent = value;
+}
+
+function showMessage(text, isError = false) {
+    message.textContent = text;
+    message.className = isError ? "message error" : "message";
+}
+
+function hideResult() {
+    resultPanel.style.display = "none";
+}
+
+function getCreatedTime(token) {
+    const time = new Date(token.createdAt || 0).getTime();
+    return Number.isNaN(time) ? 0 : time;
+}
+
+function isActive(token) {
+    const status = token.status || "Waiting";
+    return status === "Waiting" || status === "Serving";
+}
+
+/*
+ * Serving tokens are ahead of waiting tokens.
+ * Waiting priority tokens come before regular waiting tokens.
+ * Within the same group, older tokens come first.
+ */
+function compareQueueOrder(a, b) {
+    const aStatus = a.status || "Waiting";
+    const bStatus = b.status || "Waiting";
+
+    if (aStatus === "Serving" && bStatus !== "Serving") return -1;
+    if (bStatus === "Serving" && aStatus !== "Serving") return 1;
+
+    const aPriority = a.priority === true;
+    const bPriority = b.priority === true;
+
+    if (aPriority !== bPriority) {
+        return aPriority ? -1 : 1;
+    }
+
+    return getCreatedTime(a) - getCreatedTime(b);
+}
+
+function calculateQueuePosition(token, tokens) {
+    if (token.status === "Completed") {
+        return { ahead: 0, wait: 0, progress: 100 };
+    }
+
+    if (token.status === "Serving") {
+        return { ahead: 0, wait: 0, progress: 75 };
+    }
+
+    const sameService = tokens
+        .filter(item =>
+            item.service === token.service &&
+            isActive(item)
+        )
+        .sort(compareQueueOrder);
+
+    const tokenIndex = sameService.findIndex(
+        item => String(item.id) === String(token.id)
+    );
+
+    if (tokenIndex < 0) {
+        return { ahead: 0, wait: 0, progress: 0 };
+    }
+
+    const earlierTokens = sameService.slice(0, tokenIndex);
+    const peopleAhead = earlierTokens.length;
+    const duration = serviceDurations[token.service] || 5;
+
+    const estimatedWait = earlierTokens.reduce((total, item) => {
+        return total + duration;
+    }, 0);
+
+    const progress = Math.min(
+        95,
+        Math.max(5, 100 / (peopleAhead + 2))
+    );
+
+    return {
+        ahead: peopleAhead,
+        wait: estimatedWait,
+        progress
+    };
+}
+
+function renderToken(token, tokens) {
+    resultPanel.style.display = "block";
+
+    setText("resultToken", token.tokenNumber || "—");
+    setText("resultName", token.name || "—");
+    setText("resultService", token.service || "—");
+
+    const status = token.status || "Waiting";
+    const statusBadge = document.getElementById("resultStatus");
+
+    statusBadge.textContent = status;
+    statusBadge.className = "status-badge";
+
+    if (status === "Serving") {
+        statusBadge.classList.add("status-serving");
+    } else if (status === "Completed") {
+        statusBadge.classList.add("status-completed");
+    } else {
+        statusBadge.classList.add("status-waiting");
+    }
+
+    const priorityContainer = document.getElementById("priorityContainer");
+    priorityContainer.replaceChildren();
+
+    if (token.priority === true) {
+        const badge = document.createElement("span");
+        badge.className = "priority-badge";
+        badge.textContent = "⭐ Priority Token";
+        priorityContainer.appendChild(badge);
+    }
+
+    const position = calculateQueuePosition(token, tokens);
+
+    setText("resultAhead", position.ahead);
+    setText(
+        "resultWait",
+        position.wait === 1 ? "1 minute" : position.wait + " minutes"
+    );
+
+    document.getElementById("progressFill").style.width =
+        position.progress + "%";
+
+    document.getElementById("progressTrack").setAttribute(
+        "aria-valuenow",
+        String(position.progress)
+    );
+
+    let note;
+
+    if (status === "Waiting") {
+        note = "Your token is in the queue. The waiting time is an estimate and may change as staff serve tokens.";
+    } else if (status === "Serving") {
+        note = "Your token is currently being served. Please proceed to the selected service counter.";
+    } else if (status === "Completed") {
+        note = "Your token has been completed. Thank you for using SmartQueue!";
+    } else {
+        note = "Your token status is " + status + ". Please contact staff if you need assistance.";
+    }
+
+    if (status === "Waiting" && token.priority !== true) {
+        const earlierPriority = tokens.some(item =>
+            item.service === token.service &&
+            item.priority === true &&
+            item.status === "Waiting" &&
+            getCreatedTime(item) < getCreatedTime(token)
+        );
+
+        if (earlierPriority) {
+            note += " Priority tokens may be served before regular tokens.";
+        }
+    }
+
+    setText("resultNote", note);
+    message.textContent = "";
+    message.className = "";
+}
+
+function searchToken(tokenNumber) {
+    searchedTokenNumber = tokenNumber.trim().toUpperCase();
+
+    if (!searchedTokenNumber) {
+        showMessage("Please enter your token number.", true);
+        hideResult();
+        return;
+    }
+
+    const tokens = getTokens();
+
+    if (tokens === null) {
+        hideResult();
+        showMessage(
+            "Unable to read token data. Please check browser storage and try again.",
+            true
+        );
+        return;
+    }
+
+    const token = tokens.find(item =>
+        String(item.tokenNumber || "").trim().toUpperCase() ===
+        searchedTokenNumber
+    );
+
+    if (!token) {
+        hideResult();
+        showMessage(
+            "Token not found. Check the number on your receipt and try again.",
+            true
+        );
+        return;
+    }
+
+    renderToken(token, tokens);
+}
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    searchToken(tokenInput.value);
+});
+
+document.getElementById("clearButton").addEventListener("click", function () {
+    tokenInput.value = "";
+    searchedTokenNumber = "";
+    message.textContent = "";
+    message.className = "";
+    hideResult();
+    tokenInput.focus();
+});
+
+window.addEventListener("storage", function (event) {
+    if (
+        (event.key === STORAGE_KEY || event.key === null) &&
+        searchedTokenNumber
+    ) {
+        searchToken(searchedTokenNumber);
+    }
+});
+
+window.setInterval(function () {
+    if (searchedTokenNumber) {
+        searchToken(searchedTokenNumber);
+    }
+}, 3000);
+
+// Allow direct links like status.html?token=CO001
+const params = new URLSearchParams(window.location.search);
+const initialToken = params.get("token");
+
+if (initialToken) {
+    tokenInput.value = initialToken;
+    searchToken(initialToken);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof protectCurrentPage === "function") {
+        protectCurrentPage();
+    }
+
+    if (typeof updateAuthNavigation === "function") {
+        updateAuthNavigation();
+    }
+});
+</script>
+
+</body>
+</html>

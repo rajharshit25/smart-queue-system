@@ -1,0 +1,709 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Dashboard</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f2ff, #eef2ff);
+            color: #292447;
+        }
+
+        .dashboard-container {
+            width: min(1200px, 94%);
+            margin: 30px auto;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #5145cd, #9565ed);
+            color: white;
+            padding: 32px;
+            border-radius: 22px;
+            margin-bottom: 28px;
+            box-shadow: 0 12px 30px rgba(81,69,205,.22);
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(26px, 4vw, 36px);
+        }
+
+        .hero p {
+            margin: 0;
+            line-height: 1.6;
+            opacity: .95;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0 28px;
+        }
+
+        .nav-links a,
+        .nav-links button {
+            text-decoration: none;
+            color: #5145cd;
+            background: white;
+            border: 1px solid #e6e2ff;
+            padding: 11px 17px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active,
+        .nav-links button:hover {
+            background: #5145cd;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            color: #5145cd;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 8px;
+        }
+
+        [hidden] { display: none !important; }
+
+        .section-heading {
+            margin: 30px 0 16px;
+            color: #33277e;
+            font-size: 23px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #fff, #f7f5ff);
+            border: 1px solid rgba(255,255,255,.8);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(40,30,110,.12);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 35px rgba(40,30,110,.2);
+        }
+
+        .stat-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            font-size: 27px;
+            background: #eceaff;
+        }
+
+        .stat-card h3 {
+            margin: 18px 0 0;
+            color: #5f587c;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: bold;
+            color: #5145cd;
+            margin-top: 12px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            border: 1px solid #e6e2ff;
+            border-radius: 18px;
+            padding: 23px;
+            background: linear-gradient(145deg, #fff, #f7f5ff);
+            box-shadow: 0 5px 16px rgba(60,45,130,.06);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 26px rgba(60,45,130,.14);
+        }
+
+        .service-card .emoji {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            border-radius: 18px;
+            font-size: 34px;
+            background: #eceaff;
+        }
+
+        .service-card h3 {
+            color: #33277e;
+            margin: 15px 0 8px;
+        }
+
+        .service-card p {
+            color: #6b6685;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .service-counts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .count-badge {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #eeecff;
+            color: #5145cd;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .count-badge.serving {
+            background: #e0f8e9;
+            color: #187545;
+        }
+
+        .get-token {
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            background: linear-gradient(135deg, #5145cd, #9565ed);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 5px 12px rgba(81,69,205,.2);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .get-token:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(81,69,205,.3);
+        }
+
+        .section {
+            background: white;
+            border: 1px solid rgba(255,255,255,.7);
+            border-radius: 18px;
+            padding: 22px;
+            margin-top: 22px;
+            box-shadow: 0 6px 20px rgba(40,30,110,.06);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #eeeafc;
+        }
+
+        th {
+            background: #f4f2ff;
+            color: #5145cd;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        tbody tr:hover { background: #f7f5ff; }
+
+        tbody td {
+            padding-top: 17px;
+            padding-bottom: 17px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.waiting {
+            background: #fff2d5;
+            color: #986500;
+        }
+
+        .status.serving {
+            background: #e1f7e8;
+            color: #187545;
+        }
+
+        .status.completed {
+            background: #e9e7f3;
+            color: #5f587c;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            background: #ffe4e6;
+            color: #be123c;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            padding: 28px;
+            text-align: center;
+            color: #817b9c;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px 10px;
+            color: #817b9c;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .service-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-container {
+                width: 92%;
+                margin: 18px auto;
+            }
+
+            .hero { padding: 23px; }
+
+            .stats-grid, .service-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card, .service-card, .section {
+                padding: 19px;
+            }
+
+            .nav-links a, .nav-links button {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-links a, .nav-links button,
+            .stat-card, .service-card, .get-token {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<main class="dashboard-container">
+
+    <header class="hero">
+        <h1>🎟️ SmartQueue Dashboard</h1>
+        <p>
+            Welcome to SmartQueue — manage tokens, monitor waiting
+            lines, and help students save time.
+        </p>
+    </header>
+
+    <!-- Navigation with role-based visibility -->
+    <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html">🏠 Home</a>
+
+        <a href="dashboard.html" class="active"
+           data-allowed-roles="Admin">📊 Dashboard</a>
+
+        <a href="token.html"
+           data-allowed-roles="Admin,Student">🎫 Get Token</a>
+
+        <a href="status.html"
+           data-allowed-roles="Admin,Staff,Student">🔎 Token Status</a>
+
+        <a href="display.html">📺 Queue Display</a>
+
+        <a href="staff.html"
+           data-allowed-roles="Admin,Staff">👨‍💼 Staff Panel</a>
+
+        <a href="reports.html"
+           data-allowed-roles="Admin">📈 Reports</a>
+
+        <span id="authUserInfo" class="user-info"></span>
+
+        <button id="authLogoutButton"
+                type="button"
+                onclick="logoutUser()"
+                hidden>
+            Logout
+        </button>
+    </nav>
+
+    <h2 class="section-heading">📊 Queue Overview</h2>
+
+    <section class="stats-grid" aria-label="Queue statistics">
+        <article class="stat-card">
+            <div class="stat-icon">🎟️</div>
+            <h3>Total Tokens</h3>
+            <div class="stat-number" id="totalTokens">0</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <h3>Waiting</h3>
+            <div class="stat-number" id="waitingTokens">0</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon">🔔</div>
+            <h3>Now Serving</h3>
+            <div class="stat-number" id="servingTokens">0</div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon">✅</div>
+            <h3>Completed</h3>
+            <div class="stat-number" id="completedTokens">0</div>
+        </article>
+    </section>
+
+    <h2 class="section-heading">🏢 Our Services</h2>
+
+    <section class="service-grid" aria-label="Available services">
+
+        <article class="service-card">
+            <div class="emoji">🏫</div>
+            <h3>College Office</h3>
+            <p>For certificates, forms, and administrative assistance.</p>
+
+            <div class="service-counts">
+                <span class="count-badge">
+                    Waiting: <span id="officeWaiting">0</span>
+                </span>
+                <span class="count-badge serving">
+                    Serving: <span id="officeServing">0</span>
+                </span>
+            </div>
+
+            <a class="get-token"
+               data-allowed-roles="Admin,Student"
+               href="token.html?service=College%20Office">
+                Get Office Token →
+            </a>
+        </article>
+
+        <article class="service-card">
+            <div class="emoji">🩺</div>
+            <h3>Clinic</h3>
+            <p>For student health consultations and clinic assistance.</p>
+
+            <div class="service-counts">
+                <span class="count-badge">
+                    Waiting: <span id="clinicWaiting">0</span>
+                </span>
+                <span class="count-badge serving">
+                    Serving: <span id="clinicServing">0</span>
+                </span>
+            </div>
+
+            <a class="get-token"
+               data-allowed-roles="Admin,Student"
+               href="token.html?service=Clinic">
+                Get Clinic Token →
+            </a>
+        </article>
+
+        <article class="service-card">
+            <div class="emoji">🍽️</div>
+            <h3>College Canteen</h3>
+            <p>For canteen orders and service queue management.</p>
+
+            <div class="service-counts">
+                <span class="count-badge">
+                    Waiting: <span id="canteenWaiting">0</span>
+                </span>
+                <span class="count-badge serving">
+                    Serving: <span id="canteenServing">0</span>
+                </span>
+            </div>
+
+            <a class="get-token"
+               data-allowed-roles="Admin,Student"
+               href="token.html?service=College%20Canteen">
+                Get Canteen Token →
+            </a>
+        </article>
+
+    </section>
+
+    <section class="section">
+        <h2 class="section-heading" style="margin-top:0;">
+            🕒 Recent Tokens
+        </h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token No.</th>
+                        <th>Student Name</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                        <th>Issued At</th>
+                    </tr>
+                </thead>
+
+                <tbody id="recentTokens">
+                    <tr>
+                        <td colspan="5" class="empty-message">
+                            Loading tokens...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="footer">
+        SmartQueue — Smart Token and Queue Management System
+    </footer>
+
+</main>
+
+<!-- Keep authentication script near the end of the body -->
+<script src="public/js/auth.js"></script>
+
+<script>
+    "use strict";
+
+    const STORAGE_KEY = "smartQueueTokens";
+
+    function getTokens() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            const tokens = saved ? JSON.parse(saved) : [];
+
+            return Array.isArray(tokens) ? tokens : [];
+        } catch (error) {
+            console.error("Unable to read SmartQueue tokens:", error);
+            return [];
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            };
+
+            return entities[char];
+        });
+    }
+
+    function getStatusClass(status) {
+        const normalized = String(status || "").toLowerCase();
+
+        if (normalized === "serving") return "serving";
+        if (normalized === "completed") return "completed";
+
+        return "waiting";
+    }
+
+    function formatDate(value) {
+        if (!value) return "—";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return escapeHTML(value);
+        }
+
+        return escapeHTML(date.toLocaleString());
+    }
+
+    function updateNumber(id, value) {
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent = value;
+        }
+    }
+
+    function updateDashboard() {
+        const tokens = getTokens();
+
+        const waiting = tokens.filter(
+            token => token.status === "Waiting"
+        );
+
+        const serving = tokens.filter(
+            token => token.status === "Serving"
+        );
+
+        const completed = tokens.filter(
+            token => token.status === "Completed"
+        );
+
+        updateNumber("totalTokens", tokens.length);
+        updateNumber("waitingTokens", waiting.length);
+        updateNumber("servingTokens", serving.length);
+        updateNumber("completedTokens", completed.length);
+
+        const services = [
+            {
+                name: "College Office",
+                waitingId: "officeWaiting",
+                servingId: "officeServing"
+            },
+            {
+                name: "Clinic",
+                waitingId: "clinicWaiting",
+                servingId: "clinicServing"
+            },
+            {
+                name: "College Canteen",
+                waitingId: "canteenWaiting",
+                servingId: "canteenServing"
+            }
+        ];
+
+        services.forEach(service => {
+            const serviceTokens = tokens.filter(
+                token => token.service === service.name
+            );
+
+            updateNumber(
+                service.waitingId,
+                serviceTokens.filter(
+                    token => token.status === "Waiting"
+                ).length
+            );
+
+            updateNumber(
+                service.servingId,
+                serviceTokens.filter(
+                    token => token.status === "Serving"
+                ).length
+            );
+        });
+
+        const recent = tokens
+            .slice()
+            .sort((a, b) => {
+                const timeA = new Date(a.createdAt || 0).getTime();
+                const timeB = new Date(b.createdAt || 0).getTime();
+
+                return timeB - timeA;
+            })
+            .slice(0, 8);
+
+        const tableBody = document.getElementById("recentTokens");
+
+        if (!tableBody) return;
+
+        if (recent.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No tokens yet. Create your first token from
+                        the Get Token page.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tableBody.innerHTML = recent.map(token => {
+            const status = token.status || "Waiting";
+            const statusClass = getStatusClass(status);
+
+            const priorityBadge = token.priority
+                ? '<span class="priority-badge">PRIORITY</span>'
+                : "";
+
+            return `
+                <tr>
+                    <td>
+                        <strong>${escapeHTML(token.tokenNumber || "—")}</strong>
+                        ${priorityBadge}
+                    </td>
+                    <td>${escapeHTML(token.name || "—")}</td>
+                    <td>${escapeHTML(token.service || "—")}</td>
+                    <td>
+                        <span class="status ${statusClass}">
+                            ${escapeHTML(status)}
+                        </span>
+                    </td>
+                    <td>${formatDate(token.createdAt)}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", updateDashboard);
+
+    window.addEventListener("storage", function (event) {
+        if (event.key === STORAGE_KEY) {
+            updateDashboard();
+        }
+    });
+
+    // Refresh queue statistics periodically.
+    setInterval(updateDashboard, 3000);
+</script>
+
+</body>
+</html>

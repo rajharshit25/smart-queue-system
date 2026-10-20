@@ -1,0 +1,1040 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartQueue | Generate Token</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --primary: #5b5cf0;
+            --secondary: #8b5cf6;
+            --dark: #24234a;
+            --muted: #747b93;
+            --background: #f4f5ff;
+            --white: #ffffff;
+            --green: #16a34a;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', Arial, sans-serif;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f4f5ff, #eef4ff, #faf5ff);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 18px 7%;
+            background: white;
+            box-shadow: 0 3px 20px rgba(61, 57, 130, 0.07);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 23px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            color: white;
+            background: linear-gradient(135deg, #5b5cf0, #a855f7);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            padding: 9px 13px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: #626780;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            background: #eeeeff;
+        }
+
+        #authUserInfo {
+            align-self: center;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px;
+        }
+
+        #authLogoutButton {
+            padding: 9px 13px;
+            border: none;
+            border-radius: 9px;
+            background: #eeeeff;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .container {
+            width: min(100% - 32px, 900px);
+            margin: 35px auto 50px;
+        }
+
+        .page-heading {
+            text-align: center;
+            margin-bottom: 27px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 15px;
+            border-radius: 50px;
+            color: #5b5cf0;
+            background: #e8e8ff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .page-heading h1 {
+            margin: 14px 0 8px;
+            font-size: clamp(27px, 5vw, 38px);
+            line-height: 1.25;
+        }
+
+        .page-heading h1 span { color: var(--primary); }
+
+        .page-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e9eaff;
+            border-radius: 22px;
+            padding: 27px;
+            box-shadow: 0 12px 35px rgba(77, 72, 160, 0.09);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 23px;
+        }
+
+        .heading-icon {
+            width: 49px;
+            height: 49px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 15px;
+            font-size: 24px;
+            background: #ededff;
+        }
+
+        .card-heading h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .card-heading p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        label.field-label {
+            display: block;
+            margin: 18px 0 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 14px;
+            font-family: inherit;
+            font-size: 14px;
+            border: 1.5px solid #e2e5f0;
+            border-radius: 12px;
+            outline: none;
+            background: #fcfcff;
+            color: var(--dark);
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(91, 92, 240, 0.1);
+        }
+
+        .priority-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1.5px solid #ffd2d2;
+            border-radius: 13px;
+            background: #fff7f7;
+            cursor: pointer;
+        }
+
+        .priority-option input {
+            width: 19px;
+            height: 19px;
+            margin: 2px 0 0;
+            flex-shrink: 0;
+            accent-color: #b42318;
+            cursor: pointer;
+        }
+
+        .priority-copy {
+            display: block;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .priority-copy strong {
+            display: block;
+            color: #b42318;
+            font-size: 13px;
+        }
+
+        .priority-copy small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .priority-warning {
+            margin: 8px 0 0;
+            color: #9f3a38;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .primary-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            background: linear-gradient(110deg, #5b5cf0, #8b5cf6);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 7px 17px rgba(91, 92, 240, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(91, 92, 240, 0.3);
+        }
+
+        .helper {
+            margin: 15px 0 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .steps li {
+            display: flex;
+            gap: 13px;
+            margin-bottom: 22px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            background: #eeeeff;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .steps strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .steps p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 12px;
+            color: #5451a8;
+            background: #f0efff;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        #receipt {
+            display: none;
+            max-width: 650px;
+            margin: 28px auto 0;
+        }
+
+        .success-banner {
+            padding: 17px;
+            border-radius: 14px;
+            text-align: center;
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .success-icon { font-size: 31px; }
+
+        .success-banner h2 {
+            margin: 5px 0;
+            font-size: 19px;
+        }
+
+        .success-banner p {
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .token-panel {
+            margin-top: 18px;
+            padding: 24px 15px;
+            text-align: center;
+            color: white;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #5558e9, #9a53ec);
+        }
+
+        .token-panel p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .token-number {
+            margin: 9px 0;
+            font-size: clamp(34px, 6vw, 46px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            overflow-wrap: anywhere;
+        }
+
+        .token-status {
+            display: inline-block;
+            padding: 6px 13px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.2);
+            font-size: 12px;
+        }
+
+        .priority-receipt-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            color: #991b1b;
+            background: #fee2e2;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .details { margin-top: 20px; }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eeeef8;
+            font-size: 12px;
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+
+        .detail-label {
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            text-align: right;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .qr-card {
+            margin-top: 22px;
+            padding: 20px 14px;
+            text-align: center;
+            border: 1px dashed #c8c7ff;
+            border-radius: 16px;
+            background: #f9f8ff;
+        }
+
+        .qr-card h3 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .qr-card p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 17px auto;
+            min-height: 220px;
+        }
+
+        #qrcode img,
+        #qrcode canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #qrError {
+            color: #b91c1c;
+            font-size: 12px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .print-button,
+        .another-button {
+            flex: 1;
+            min-width: 180px;
+            padding: 13px;
+            border: none;
+            border-radius: 11px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .print-button {
+            color: white;
+            background: var(--primary);
+        }
+
+        .another-button {
+            color: var(--primary);
+            background: #eeeeff;
+        }
+
+        .footer {
+            padding: 23px 15px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 720px) {
+            .navbar { padding: 15px 5%; }
+            .nav-links { gap: 5px; }
+
+            .nav-links a {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .main-grid { grid-template-columns: 1fr; }
+            .card { padding: 22px; }
+            .container { margin-top: 25px; }
+        }
+
+        @media print {
+            body { background: white; }
+
+            .navbar,
+            .page-heading,
+            #formCard,
+            #howItWorks,
+            .footer,
+            .button-row,
+            .info-box {
+                display: none !important;
+            }
+
+            .container {
+                width: 100%;
+                margin: 0;
+            }
+
+            #receipt {
+                display: block !important;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .success-banner { border: 1px solid #ddd; }
+
+            .token-panel {
+                color: black;
+                background: white;
+                border: 2px solid #5558e9;
+            }
+
+            .token-status {
+                color: black;
+                border: 1px solid #ddd;
+                background: white;
+            }
+
+            .qr-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">
+        <span class="brand-icon">Q</span>
+        SmartQueue
+    </a>
+
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html" id="authLoginLink">Login</a>
+        <a href="dashboard.html" data-allowed-roles="Admin">Dashboard</a>
+        <a href="token.html" class="active" data-allowed-roles="Admin,Student">Get Token</a>
+        <a href="status.html" data-allowed-roles="Admin,Staff,Student">Check Status</a>
+        <a href="display.html">Queue Display</a>
+        <a href="staff.html" data-allowed-roles="Admin,Staff">Staff</a>
+        <a href="reports.html" data-allowed-roles="Admin">Reports</a>
+
+        <span id="authUserInfo"></span>
+
+        <button type="button" id="authLogoutButton"
+                style="display:none;" onclick="logoutUser()">
+            Logout
+        </button>
+    </div>
+</nav>
+
+<main class="container">
+
+    <header class="page-heading">
+        <span class="eyebrow">QUICK • EASY • SMART</span>
+        <h1>Get Your Queue <span>Token</span></h1>
+        <p>Enter your details, select a service, and get your token instantly.</p>
+    </header>
+
+    <div class="main-grid">
+
+        <section class="card" id="formCard">
+            <div class="card-heading">
+                <div class="heading-icon">🎟️</div>
+                <div>
+                    <h2>Generate Token</h2>
+                    <p>Fill in the details below</p>
+                </div>
+            </div>
+
+            <form id="generateForm">
+                <label class="field-label" for="studentName">
+                    👤 Student Name
+                </label>
+                <input type="text" id="studentName"
+                       placeholder="Enter your full name"
+                       maxlength="80" required>
+
+                <label class="field-label" for="service">
+                    🏢 Select Service
+                </label>
+                <select id="service" required>
+                    <option value="">-- Choose a service --</option>
+                    <option value="College Office">🏢 College Office</option>
+                    <option value="Clinic">🩺 Clinic</option>
+                    <option value="College Canteen">🍽️ College Canteen</option>
+                </select>
+
+                <label class="priority-option" for="priorityToken">
+                    <input type="checkbox" id="priorityToken">
+                    <span class="priority-copy">
+                        <strong>⭐ Request Priority Token</strong>
+                        <small>
+                            Priority tokens are placed ahead of regular
+                            waiting tokens. Tokens already being served
+                            and earlier priority tokens remain ahead.
+                        </small>
+                    </span>
+                </label>
+
+                <p class="priority-warning">
+                    Note: Select priority only when appropriate and
+                    permitted by your institution.
+                </p>
+
+                <button type="submit" class="primary-button">
+                    ✨ Generate My Token
+                </button>
+
+                <p class="helper">
+                    Your token will be saved in this browser and displayed
+                    on queue pages using the same browser storage.
+                </p>
+            </form>
+        </section>
+
+        <section class="card" id="howItWorks">
+            <div class="card-heading">
+                <div class="heading-icon">💡</div>
+                <div>
+                    <h2>How It Works</h2>
+                    <p>Three simple steps</p>
+                </div>
+            </div>
+
+            <ul class="steps">
+                <li>
+                    <span class="step-number">1</span>
+                    <div>
+                        <strong>Enter Your Details</strong>
+                        <p>Provide your name and select the service you need.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <div>
+                        <strong>Get Your Token</strong>
+                        <p>Your unique token number and estimated waiting time will be displayed.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <div>
+                        <strong>Track Your Queue</strong>
+                        <p>Use Queue Display or Check Status to follow your token.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="info-box">
+                💜 <strong>SmartQueue tip:</strong>
+                Keep your token number safe. Priority tokens are identified
+                with a priority badge on queue pages.
+            </div>
+        </section>
+
+    </div>
+
+    <section class="card" id="receipt">
+
+        <div class="success-banner">
+            <div class="success-icon">✅</div>
+            <h2>Token Generated Successfully!</h2>
+            <p>Your token has been saved. Please keep these details.</p>
+        </div>
+
+        <div class="token-panel">
+            <p>YOUR TOKEN NUMBER</p>
+            <div class="token-number" id="receiptToken">--</div>
+            <span class="token-status" id="receiptStatus">🟡 Waiting in Queue</span>
+
+            <div id="receiptPriorityBadge"
+                 class="priority-receipt-badge"
+                 style="display:none;">
+                ⭐ PRIORITY TOKEN
+            </div>
+        </div>
+
+        <div class="details">
+            <div class="detail-row">
+                <span class="detail-label">👤 Student Name</span>
+                <span class="detail-value" id="receiptName">--</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">🏢 Service</span>
+                <span class="detail-value" id="receiptService">--</span>
+            </div>
+            <div class="detail-row" id="priorityReceiptRow" style="display:none;">
+                <span class="detail-label">⭐ Queue Type</span>
+                <span class="detail-value" id="receiptPriority">Priority Token</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">🕒 Issued At</span>
+                <span class="detail-value" id="receiptTime">--</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">👥 People Ahead</span>
+                <span class="detail-value" id="peopleAhead">0</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">⏳ Estimated Wait</span>
+                <span class="detail-value" id="estimatedWait">0 minutes</span>
+            </div>
+        </div>
+
+        <div class="qr-card">
+            <h3>📱 Your Personal QR Code</h3>
+            <p>
+                Scan this code to view your token number, student name,
+                service, queue type, and status page link.
+            </p>
+            <div id="qrcode"></div>
+            <p id="qrError"></p>
+        </div>
+
+        <div class="button-row">
+            <button type="button" class="print-button" onclick="window.print()">
+                🖨️ Print Token Receipt
+            </button>
+            <button type="button" class="another-button"
+                    onclick="generateAnotherToken()">
+                ➕ Generate Another Token
+            </button>
+        </div>
+
+        <div class="info-box">
+            💜 <strong>Remember:</strong> Keep your token number safe
+            and check Queue Display for updates.
+        </div>
+
+    </section>
+</main>
+
+<footer class="footer">
+    💜 SmartQueue — Smart Queue &amp; Token Management System
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+    const STORAGE_KEY = "smartQueueTokens";
+
+    const serviceSettings = {
+        "College Office": { prefix: "CO", duration: 5 },
+        "Clinic": { prefix: "CL", duration: 10 },
+        "College Canteen": { prefix: "CA", duration: 3 }
+    };
+
+    function getTokens() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) return [];
+
+            const tokens = JSON.parse(stored);
+            return Array.isArray(tokens) ? tokens : [];
+        } catch (error) {
+            console.error("Unable to read tokens:", error);
+            alert("Unable to read saved tokens. Please check browser storage.");
+            return [];
+        }
+    }
+
+    function saveTokens(tokens) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+    }
+
+    function createTokenNumber(service, tokens) {
+        const prefix = serviceSettings[service].prefix;
+
+        const highestNumber = tokens.reduce((highest, token) => {
+            if (token.service !== service ||
+                typeof token.tokenNumber !== "string") {
+                return highest;
+            }
+
+            const match = token.tokenNumber.match(
+                new RegExp("^" + prefix + "(\\d+)$")
+            );
+
+            return match
+                ? Math.max(highest, Number(match[1]))
+                : highest;
+        }, 0);
+
+        return prefix + String(highestNumber + 1).padStart(3, "0");
+    }
+
+    function sortWaitingTokens(tokens) {
+        return [...tokens].sort((a, b) => {
+            const priorityA = a.priority === true ? 1 : 0;
+            const priorityB = b.priority === true ? 1 : 0;
+
+            if (priorityA !== priorityB) {
+                return priorityB - priorityA;
+            }
+
+            return new Date(a.createdAt) - new Date(b.createdAt);
+        });
+    }
+
+    function getPeopleAhead(service, tokens, isPriority) {
+        const sameService = tokens.filter(token =>
+            token.service === service &&
+            ["Waiting", "Serving"].includes(token.status)
+        );
+
+        const servingCount = sameService.filter(
+            token => token.status === "Serving"
+        ).length;
+
+        const waiting = sortWaitingTokens(
+            sameService.filter(token => token.status === "Waiting")
+        );
+
+        if (isPriority) {
+            return servingCount +
+                waiting.filter(token => token.priority === true).length;
+        }
+
+        return servingCount + waiting.length;
+    }
+
+    function generateQRCode(tokenNumber, service, studentName, isPriority) {
+        const qrContainer = document.getElementById("qrcode");
+        const qrError = document.getElementById("qrError");
+
+        qrContainer.innerHTML = "";
+        qrError.textContent = "";
+
+        if (typeof QRCode === "undefined") {
+            qrError.textContent =
+                "QR library could not load. Check your internet connection and refresh.";
+            return;
+        }
+
+        const statusURL = new URL("status.html", window.location.href);
+        statusURL.searchParams.set("token", tokenNumber);
+
+        const qrText = [
+            "SmartQueue",
+            "Student Name: " + studentName,
+            "Token Number: " + tokenNumber,
+            "Service: " + service,
+            "Queue Type: " + (isPriority ? "Priority" : "Regular"),
+            "Check status: " + statusURL.href
+        ].join("\n");
+
+        try {
+            new QRCode(qrContainer, {
+                text: qrText,
+                width: 220,
+                height: 220,
+                colorDark: "#24234a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.L
+            });
+        } catch (error) {
+            console.error("QR generation failed:", error);
+            qrError.textContent =
+                "Could not generate the QR code. Please refresh and try again.";
+        }
+    }
+
+    function applyServiceFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const requestedService = params.get("service");
+
+        if (requestedService && serviceSettings[requestedService]) {
+            document.getElementById("service").value = requestedService;
+        }
+    }
+
+    document.getElementById("generateForm").addEventListener(
+        "submit",
+        function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("studentName")
+                .value.trim();
+
+            const service = document.getElementById("service").value;
+            const isPriority =
+                document.getElementById("priorityToken").checked;
+
+            if (!name || !service || !serviceSettings[service]) {
+                alert("Please enter your name and select a valid service.");
+                return;
+            }
+
+            const tokens = getTokens();
+            const now = new Date();
+            const tokenNumber = createTokenNumber(service, tokens);
+
+            const peopleAhead = getPeopleAhead(
+                service,
+                tokens,
+                isPriority
+            );
+
+            const estimatedWait =
+                peopleAhead * serviceSettings[service].duration;
+
+            const token = {
+                id: Date.now().toString() +
+                    Math.random().toString(36).slice(2, 8),
+                name: name,
+                service: service,
+                tokenNumber: tokenNumber,
+                status: "Waiting",
+                createdAt: now.toISOString(),
+                priority: isPriority
+            };
+
+            tokens.push(token);
+
+            try {
+                saveTokens(tokens);
+            } catch (error) {
+                console.error("Unable to save token:", error);
+                alert(
+                    "Could not save your token. Check browser storage and available space, then try again."
+                );
+                return;
+            }
+
+            document.getElementById("receiptToken").textContent = tokenNumber;
+            document.getElementById("receiptName").textContent = name;
+            document.getElementById("receiptService").textContent = service;
+            document.getElementById("receiptTime").textContent =
+                now.toLocaleString();
+            document.getElementById("peopleAhead").textContent = peopleAhead;
+            document.getElementById("estimatedWait").textContent =
+                estimatedWait + " minutes";
+
+            document.getElementById("priorityReceiptRow").style.display =
+                isPriority ? "flex" : "none";
+
+            document.getElementById("receiptPriorityBadge").style.display =
+                isPriority ? "inline-block" : "none";
+
+            document.getElementById("receiptPriority").textContent =
+                isPriority ? "⭐ Priority Token" : "Regular Token";
+
+            document.getElementById("receiptStatus").textContent =
+                isPriority
+                    ? "⭐ Priority — Waiting in Queue"
+                    : "🟡 Waiting in Queue";
+
+            document.getElementById("formCard").style.display = "none";
+            document.getElementById("howItWorks").style.display = "none";
+            document.getElementById("receipt").style.display = "block";
+
+            generateQRCode(tokenNumber, service, name, isPriority);
+
+            document.getElementById("receipt").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    );
+
+    function generateAnotherToken() {
+        document.getElementById("generateForm").reset();
+
+        document.getElementById("receipt").style.display = "none";
+        document.getElementById("formCard").style.display = "block";
+        document.getElementById("howItWorks").style.display = "block";
+
+        document.getElementById("qrcode").innerHTML = "";
+        document.getElementById("qrError").textContent = "";
+
+        applyServiceFromURL();
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof updateAuthNavigation === "function") {
+            updateAuthNavigation();
+        }
+
+        if (typeof protectCurrentPage === "function") {
+            protectCurrentPage();
+        }
+
+        applyServiceFromURL();
+    });
+</script>
+
+<script src="public/js/auth.js"></script>
+
+</body>
+</html>

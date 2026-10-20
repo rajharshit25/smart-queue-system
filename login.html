@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | SmartQueue</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body.login-page {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            color: #f8fafc;
+            background: linear-gradient(
+                135deg,
+                #0f172a,
+                #1e1b4b,
+                #312e81
+            );
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 460px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 20px;
+            background: rgba(15, 23, 42, .94);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+        }
+
+        .login-header {
+            margin-bottom: 26px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .login-header p,
+        .login-footer {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .login-form label {
+            display: block;
+            margin: 16px 0 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            background: #1e293b;
+            color: white;
+            font-size: 15px;
+        }
+
+        .login-form input:focus {
+            outline: 2px solid #818cf8;
+            border-color: #818cf8;
+        }
+
+        .login-button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            opacity: .9;
+        }
+
+        .login-button:disabled {
+            opacity: .65;
+            cursor: wait;
+        }
+
+        .login-message {
+            min-height: 20px;
+            margin-top: 14px;
+            color: #fca5a5;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .login-message.success {
+            color: #86efac;
+        }
+
+        .demo-section {
+            margin-top: 26px;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+        }
+
+        .demo-section h2 {
+            margin: 0 0 8px;
+            font-size: 17px;
+        }
+
+        .demo-section p {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .demo-roles {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .demo-role {
+            padding: 12px 6px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            background: #1e293b;
+            color: white;
+            cursor: pointer;
+        }
+
+        .demo-role:hover {
+            border-color: #818cf8;
+            background: #312e81;
+        }
+
+        .demo-role strong,
+        .demo-role span {
+            display: block;
+        }
+
+        .demo-role span {
+            margin-top: 5px;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        .login-notice {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, .1);
+            color: #fcd34d;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .login-footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 420px) {
+            .login-container {
+                padding: 22px;
+            }
+
+            .demo-roles {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="login-page">
+
+    <main class="login-container">
+
+        <header class="login-header">
+            <h1>SmartQueue</h1>
+            <p>Sign in to manage your queue</p>
+        </header>
+
+        <form id="loginForm" class="login-form">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                autocomplete="username"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button
+                class="login-button"
+                id="loginButton"
+                type="submit"
+            >
+                Sign In
+            </button>
+
+            <p
+                id="loginMessage"
+                class="login-message"
+                role="alert"
+                aria-live="polite"
+            ></p>
+        </form>
+
+        <section class="demo-section">
+            <h2>Quick Demo Login</h2>
+            <p>Select a role to fill in the demo credentials.</p>
+
+            <div class="demo-roles">
+
+                <button
+                    class="demo-role"
+                    type="button"
+                    data-username="admin"
+                    data-password="Admin123"
+                >
+                    <strong>Admin</strong>
+                    <span>Dashboard</span>
+                </button>
+
+                <button
+                    class="demo-role"
+                    type="button"
+                    data-username="staff"
+                    data-password="Staff123"
+                >
+                    <strong>Staff</strong>
+                    <span>Queue control</span>
+                </button>
+
+                <button
+                    class="demo-role"
+                    type="button"
+                    data-username="student"
+                    data-password="Student123"
+                >
+                    <strong>Student</strong>
+                    <span>My tokens</span>
+                </button>
+
+            </div>
+        </section>
+
+        <div class="login-notice">
+            Front-end demo only. This authentication is not secure
+            for production use.
+        </div>
+
+        <footer class="login-footer">
+            SmartQueue · College Mini Project
+        </footer>
+
+    </main>
+
+    <!-- Authentication functions -->
+    <script src="public/js/auth.js"></script>
+
+    <script>
+        "use strict";
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("loginForm");
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const loginMessage = document.getElementById("loginMessage");
+            const loginButton = document.getElementById("loginButton");
+
+            let isSubmitting = false;
+
+            // Fill demo credentials when a role is selected.
+            document.querySelectorAll(".demo-role").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    usernameInput.value = button.dataset.username;
+                    passwordInput.value = button.dataset.password;
+
+                    loginMessage.textContent = "";
+                    loginMessage.classList.remove("success");
+
+                    usernameInput.focus();
+                });
+            });
+
+            // Process login form submission.
+            loginForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                if (isSubmitting) {
+                    return;
+                }
+
+                loginMessage.textContent = "";
+                loginMessage.classList.remove("success");
+
+                if (
+                    typeof loginUser !== "function" ||
+                    typeof getRoleHome !== "function"
+                ) {
+                    loginMessage.textContent =
+                        "Authentication script failed to load. " +
+                        "Check public/js/auth.js.";
+
+                    return;
+                }
+
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!username || !password) {
+                    loginMessage.textContent =
+                        "Please enter both username and password.";
+
+                    return;
+                }
+
+                let result;
+
+                try {
+                    result = loginUser(username, password);
+                } catch (error) {
+                    console.error("Login error:", error);
+
+                    loginMessage.textContent =
+                        "Something went wrong while signing in. " +
+                        "Please try again.";
+
+                    return;
+                }
+
+                if (!result || !result.success) {
+                    loginMessage.textContent =
+                        result?.message ||
+                        "Invalid username or password.";
+
+                    passwordInput.focus();
+                    passwordInput.select();
+
+                    return;
+                }
+
+                isSubmitting = true;
+                loginButton.disabled = true;
+                loginButton.textContent = "Signing in...";
+
+                loginMessage.textContent =
+                    "Login successful. Redirecting...";
+
+                loginMessage.classList.add("success");
+
+                const destination = getRoleHome(result.user.role);
+
+                window.location.replace(destination);
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+{
+  "name": "smart-queue-system-new",
+  "version": "1.0.0",
+  "description": "Smart Queue and Token Management System",
+  "private": true,
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
