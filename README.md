@@ -1,3 +1,12 @@
+
+<div align="center">
+
+<img src="assets/smartqueue-banner.png" alt="SmartQueue — Smart Queue & Token Management System" width="100%" />
+
+</div>
+
+
+
  <div align="center">
 
 # 🟣 SmartQueue
